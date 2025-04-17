@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Licznik publikacji (z analizą HTML)</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f4f4f4;
+      padding: 2rem;
+      max-width: 700px;
+      margin: auto;
+    }
+    h1 {
+      font-size: 1.6rem;
+    }
+    #output {
+      background: white;
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 10px;
+      font-size: 1.2rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+  </style>
+</head>
+<body>
+  <h1>Licznik publikacji z Money.pl (HTML-aware)</h1>
+  <div id="output">Trwa pobieranie danych...</div>
+
+  <script>
+    async function policzPublikacje() {
+      const dzis = new Date();
+      const rok = dzis.getFullYear();
+      const miesiac = String(dzis.getMonth() + 1).padStart(2, '0');
+      const dzien = String(dzis.getDate()).padStart(2, '0');
+      const url = `https://www.money.pl/archiwum/data/${rok}-${miesiac}-${dzien}/`;
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+
+      try {
+        const response = await fetch(proxyUrl);
+        const data = await response.json();
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(data.contents, "text/html");
+
+        const listy = doc.querySelectorAll('li.archive__list-item');
+        let licznik = 0;
+
+        listy.forEach(li => {
+          const godzina = li.querySelector('.archive__time');
+          const link = li.querySelector('.archive__link');
+          if (godzina && link && godzina.textContent.match(/^\d{2}:\d{2}$/)) {
+            licznik++;
+          }
+        });
+
+        document.getElementById("output").innerHTML =
+          `<strong>Opublikowano ${licznik} tekstów dnia ${rok}-${miesiac}-${dzien}.</strong>`;
+      } catch (error) {
+        console.error(error);
+        document.getElementById("output").innerText =
+          "Nie udało się pobrać danych. Spróbuj później.";
+      }
+    }
+
+    policzPublikacje();
+  </script>
+</body>
+</html>
