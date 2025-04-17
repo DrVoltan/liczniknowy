@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Licznik publikacji Money.pl</title>
+  <style>
+    body { font-family: sans-serif; background: #f4f4f4; padding: 2rem; max-width: 700px; margin: auto; }
+    h1 { font-size: 1.6rem; }
+    #output { background: white; padding: 1rem; border-radius: 10px; font-size: 1.2rem; box-shadow: 0 0 10px rgba(0,0,0,0.05); margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Liczba publikacji na Money.pl (dziś)</h1>
+  <div id="output">Trwa pobieranie danych...</div>
+
+  <script>
+    fetch('/api/licznik')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('output').innerHTML =
+          `<strong>Opublikowano ${data.liczba} tekstów dnia ${data.data}.</strong>`;
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('output').innerText = 'Nie udało się pobrać danych.';
+      });
+  </script>
+</body>
+</html>
