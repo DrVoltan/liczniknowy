@@ -19,11 +19,12 @@ export default async function handler(req, res) {
     }
 
     const html = await response.text();
+    console.log("=== HTML długość:", html.length, "===");
     console.log("=== HTML FRAGMENT START ===");
     console.log(html.slice(0, 1000));
     console.log("=== HTML FRAGMENT END ===");
 
-    const regex = /<span class="archive__time">\d{2}:\d{2}<\/span>[\s\S]*?<a[^>]*class="archive__link"[^>]*>.*?<\/a>/g;
+    const regex = /<span class="archive__time">\\d{2}:\\d{2}<\\/span>[\\s\\S]*?<a[^>]*class="archive__link"[^>]*>.*?<\\/a>/g;
     const matches = html.match(regex) || [];
 
     console.log("Znaleziono publikacji:", matches.length);
