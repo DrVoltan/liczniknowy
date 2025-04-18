@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
     const html = await response.text();
 
-    // Wyszukujemy wszystkie pary <span class="archive__time">HH:MM</span> ... <a class="archive__link" ...>Tytuł</a>
+    // Szukamy par <span class="archive__time">HH:MM</span> ... <a class="archive__link">Tytuł</a>
     const regex = /<span class="archive__time">\d{2}:\d{2}<\/span>[\s\S]*?<a[^>]*class="archive__link"[^>]*>.*?<\/a>/g;
 
     const matches = html.match(regex) || [];
