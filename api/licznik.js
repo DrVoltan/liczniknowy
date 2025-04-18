@@ -20,16 +20,10 @@ export default async function handler(req, res) {
 
     const html = await response.text();
 
-    const cleaned = html
-      .replace(/<script[\s\S]*?<\/script>/gi, '')
-      .replace(/<style[\s\S]*?<\/style>/gi, '')
-      .replace(/<[^>]+>/g, '\n');
+    // Wyszukujemy wszystkie pary <span class="archive__time">HH:MM</span> ... <a class="archive__link" ...>Tytuł</a>
+    const regex = /<span class="archive__time">\d{2}:\d{2}<\/span>[\s\S]*?<a[^>]*class="archive__link"[^>]*>.*?<\/a>/g;
 
-    const lines = cleaned.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-
-    // Szukamy linii, które zaczynają się od godziny, ale nie są tylko samą godziną
-    const regex = /^\d{2}:\d{2}/;
-    const matches = lines.filter(line => regex.test(line) && line.length > 5);
+    const matches = html.match(regex) || [];
 
     res.status(200).json({ data: `${year}-${month}-${day}`, liczba: matches.length });
   } catch (error) {
