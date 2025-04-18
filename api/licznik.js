@@ -20,19 +20,16 @@ export default async function handler(req, res) {
 
     const html = await response.text();
 
-    // Usuń tagi <script> i <style> z zawartością
-    const bezSkryptow = html
+    const cleaned = html
       .replace(/<script[\s\S]*?<\/script>/gi, '')
-      .replace(/<style[\s\S]*?<\/style>/gi, '');
+      .replace(/<style[\s\S]*?<\/style>/gi, '')
+      .replace(/<[^>]+>/g, '\n');
 
-    // Zamień pozostałe znaczniki HTML na nowe linie
-    const text = bezSkryptow.replace(/<[^>]+>/g, '\n');
+    const lines = cleaned.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
 
-    const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-
-    // Zlicz tylko linie zaczynające się od godziny i zawierające minimum jedno słowo po niej
-    const regex = /^\d{2}:\d{2}\s+\S+/;
-    const matches = lines.filter(line => regex.test(line));
+    // Szukamy linii, które zaczynają się od godziny, ale nie są tylko samą godziną
+    const regex = /^\d{2}:\d{2}/;
+    const matches = lines.filter(line => regex.test(line) && line.length > 5);
 
     res.status(200).json({ data: `${year}-${month}-${day}`, liczba: matches.length });
   } catch (error) {
